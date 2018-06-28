@@ -91,6 +91,27 @@ def find_user_dn(conn, uid):
 
     return conn.response[0]['dn'] if conn.response else None
 
+def add_user(*args):
+    if search_user(user):
+        print "User already exist!"
+        return 1
+    try:
+        l = ldap.initialize(ldap_server)
+        l.simple_bind_s("cn=%s,dc=%s,dc=%s" % (admin_user, dc1, dc2), admin_password)
+
+        dn = "cn=%s,ou=%s,dc=%s,dc=%s" % (user, org, dc1, dc2)
+
+        attrs = {'objectclass': ['organizationalPerson', 'person', 'inetOrgPerson', 'top'], 'uid': user,
+                 'cn': user, 'sn': user, 'ou': org, 'mail': "%s@vng.com.vn" % user,
+                 'userPassword': str(make_secret(passwd)), 'telephonenumber': str(phone),
+                 'description': ''}
+
+        ldif = addModlist(attrs)
+        l.add_s(dn, ldif)
+        l.unbind_s()
+        return 0
+    except ldap.LDAPError, e:
+        print e.args[0]['desc']
 
 def read_config():
     config = ConfigParser()
@@ -109,7 +130,7 @@ if environ.get('DEBUG'):
 # Set up logging.
 logging.basicConfig(format=LOG_FORMAT)
 LOG.setLevel(logging.INFO)
-LOG.info("Starting ldap-passwd-webui %s" % VERSION)
+LOG.info("Starting ldap-admin-webui %s" % VERSION)
 
 CONF = read_config()
 

@@ -1,0 +1,14 @@
+[html]
+page_title = Admin login
+
+[ldap]
+host = localhost
+port = 389
+use_ssl = false
+base = ou=Users,dc=example,dc=com
+search_filter = uid={uid}
+
+[server]
+server = auto
+host = localhost
+port = 5001
